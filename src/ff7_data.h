@@ -250,7 +250,7 @@ inline void ff7_find_externals(struct ff7_game_obj* game_object)
 	ff7_externals.field_file_buffer = (char**)get_absolute_value((uint32_t)ff7_externals.read_field_file, 0xB2);
 	ff7_externals.field_file_section_ptrs = (DWORD*)get_absolute_value((uint32_t)ff7_externals.read_field_file, 0x187);
 	ff7_externals.known_field_buffer_size = (uint32_t*)get_absolute_value((uint32_t)ff7_externals.read_field_file, 0xA4);
-	ff7_externals.field_CFF268 = (uint32_t*)get_absolute_value((uint32_t)ff7_externals.read_field_file, 0xB);
+	ff7_externals.field_resuming_from_battle_CFF268 = (uint32_t*)get_absolute_value((uint32_t)ff7_externals.read_field_file, 0xB);
 
 	ff7_externals.lgp_fds = (FILE **)get_absolute_value(ff7_externals.lgp_seek_file, 0x17);
 
@@ -627,6 +627,8 @@ inline void ff7_find_externals(struct ff7_game_obj* game_object)
 	ff7_externals.engine_set_game_engine_world_coord_661B23 = (void (*)(int, int))get_relative_call(ff7_externals.field_sub_661B68, 0x1A);
 	ff7_externals.engine_sub_67CCDE = (void (*)(float, float, float, float, float, float, float, ff7_game_obj*))get_relative_call(ff7_externals.field_sub_661B68, 0x72);
 	ff7_externals.field_handle_screen_fading = get_relative_call(ff7_externals.field_loop_sub_63C17F, 0x634);
+	ff7_externals.sub_62120E = get_relative_call(ff7_externals.enter_field, 0x229);
+	ff7_externals.field_load_map_trigger_data_sub_6211C3 = (int(*)())get_relative_call(ff7_externals.sub_62120E, 0x3AA);
 
 	ff7_externals.sfx_stop_channel_6 = get_relative_call(common_externals.sfx_cleanup, 0x16);
 	ff7_externals.sfx_stop_channel_timer_handle = (UINT *)get_absolute_value(ff7_externals.sfx_stop_channel_6, 0x5);
@@ -663,6 +665,7 @@ inline void ff7_find_externals(struct ff7_game_obj* game_object)
 	ff7_externals.fps_limiter_chocobo = get_relative_call(ff7_externals.sub_779E14, 0x4D);
 	ff7_externals.fps_limiter_submarine = get_relative_call(submarine_main_loop, 0x98);
 	ff7_externals.fps_limiter_credits = get_relative_call(credits_main_loop, 0x1C);
+	ff7_externals.fps_limiter_menu = get_relative_call(menu_main_loop, 0x16);
 
 	ff7_externals.battle_fps_menu_multiplier = battle_main_loop + 0x335;
 	ff7_externals.submarine_minigame_status = (DWORD *)get_absolute_value(ff7_externals.fps_limiter_submarine, 0x48);

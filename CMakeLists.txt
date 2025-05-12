@@ -29,7 +29,8 @@ if (NOT DEFINED _DLL_VERSION OR NOT _DLL_VERSION)
   message(FATAL_ERROR "_DLL_VERSION must be set to continue building with cmake. \nExample: Add -D_DLL_VERSION=devel to your cmake command line.")
 endif ()
 
-set(VCPKG_INSTALL_OPTIONS "--clean-after-build" "--x-use-aria2")
+set(VCPKG_DISABLE_COMPILER_TRACKING 1)
+set(VCPKG_INSTALL_OPTIONS "--clean-after-build" "--allow-unsupported")
 
 set(CMAKE_SHARED_LINKER_FLAGS
   "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:MSVCRT /NODEFAULTLIB:MSVCRTD /DEBUG:FULL /FORCE:MULTIPLE /IGNORE:4006,4075,4099,4217"
@@ -167,6 +168,7 @@ target_link_directories(
 target_link_libraries(
   ${RELEASE_NAME}
   ${RELEASE_NAME}::rc
+  comctl32
   wintrust
   dbghelp
   shlwapi
@@ -221,7 +223,12 @@ endif()
 target_compile_features(${RELEASE_NAME}
   PRIVATE cxx_std_20
 )
-target_link_options(${RELEASE_NAME} PRIVATE /PDBALTPATH:${RELEASE_NAME}.pdb PRIVATE /DEF:${CMAKE_SOURCE_DIR}/misc/${RELEASE_NAME}.def)
+target_link_options(
+  ${RELEASE_NAME}
+  PRIVATE /PDBALTPATH:${RELEASE_NAME}.pdb
+  PRIVATE /DEF:${CMAKE_SOURCE_DIR}/misc/${RELEASE_NAME}.def
+  PRIVATE /MANIFESTDEPENDENCY:"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"
+)
 
 # SHADER COMPILATION
 set(FFNX_SHADERS "FFNx" "FFNx.lighting" "FFNx.shadowmap" "FFNx.field.shadow" "FFNx.overlay" "FFNx.post" "FFNx.blit")

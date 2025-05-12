@@ -5,8 +5,8 @@
 vcpkg_from_github(OUT_SOURCE_PATH SOURCE_DIR
     REPO "julianxhokaxhiu/soloud"
     HEAD_REF master
-    REF 49e897092e3b95a1f460f69bb525ec02f107527b
-    SHA512 82c50bb48df11199d3b4d18cecd5ed5da758aafa3e907afe2a2f145fea61143ae514e5e357e502e736fe2293a5eedf877e8d386e17c912cb068ca68772bcb480
+    REF b60198d2661e57c91f5dd058d5bb873a21bce66d
+    SHA512 33885a425301512c80ebeef61a6a902c556796525531eca75472e3f49d33dda36ee2fe2b660755b92bc396e61bdb8fe9b7ebfb8d01aa3f1250390c28795277ba
 )
 
 # Set up GENie (custom project generator)
@@ -81,13 +81,12 @@ vcpkg_execute_required_process(
 
 # Run MSBuild
 
-vcpkg_install_msbuild(
+vcpkg_msbuild_install(
     SOURCE_PATH "${SOURCE_DIR}"
     PROJECT_SUBPATH "build/${GENIE_ACTION}/SoLoud${SOLOUD_PROJNAME}.vcxproj"
-    LICENSE_SUBPATH "LICENSE"
-    INCLUDES_SUBPATH "include"
-    ALLOW_ROOT_INCLUDES
 )
+file(INSTALL "${SOURCE_DIR}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME "copyright")
+file(INSTALL "${SOURCE_DIR}/include/" DESTINATION "${CURRENT_PACKAGES_DIR}/include")
 
 # Copy cmake configuration files
 configure_file(${CMAKE_CURRENT_LIST_DIR}/FindSOLOUD.cmake.in ${CURRENT_PACKAGES_DIR}/share/${PORT}/FindSOLOUD.cmake @ONLY)

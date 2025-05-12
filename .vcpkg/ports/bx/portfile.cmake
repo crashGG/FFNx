@@ -7,8 +7,8 @@ vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 vcpkg_from_github(OUT_SOURCE_PATH SOURCE_DIR
     REPO "julianxhokaxhiu/bx"
     HEAD_REF master
-    REF 17c530b668d8694005ed2d9af1fc4707fbf88304
-    SHA512 9b49940a68a229b371c9dd9f114b75b4ac888936d627ea2f5e8a94ba64e96f7769839cd385359c6d89bb9e9f0d7174492aa64caad56f621241c5031c3fb61c27
+    REF 2c17bea5d83c14121a3bfb18840651803c2e2623
+    SHA512 265120ddc66dea6f5d43614a10cb2edbc116f542ca0f432a3a017498766d3cab9f9adb3221311f3738626cad96454390fef7e70ee34e1d59cf9cd3d921fda59c
 )
 
 # Set up GENie (custom project generator)
@@ -104,12 +104,12 @@ if(GENIE_ACTION STREQUAL cmake)
     file(INSTALL "${SOURCE_DIR}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
 else()
     # Run MSBuild
-    vcpkg_install_msbuild(
+    vcpkg_msbuild_install(
         SOURCE_PATH "${SOURCE_DIR}"
         PROJECT_SUBPATH ".build/projects/${PROJ_FOLDER}/bx.vcxproj"
-        LICENSE_SUBPATH "LICENSE"
-        INCLUDES_SUBPATH "include"
     )
+    file(INSTALL "${SOURCE_DIR}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME "copyright")
+    file(INSTALL "${SOURCE_DIR}/include/" DESTINATION "${CURRENT_PACKAGES_DIR}/include")
 endif()
 
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
