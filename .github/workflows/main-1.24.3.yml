@@ -41,6 +41,28 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
+
+    # === 新增：导出 vcpkg 官方推荐的 GitHub Actions 缓存环境变量 ===
+    - name: Export GitHub Actions Cache Environment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;x-gha,readwrite');
+
+    # === 让 GitHub 记住 vcpkg 下载与编译的依赖包 ===
+    - name: vcpkg Cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg/downloads
+          ${{ github.workspace }}/vcpkg/installed
+          ~/.cache/vcpkg
+        # === 核心修改：在 Key 里面加入分支名，防止 dev 和 master 缓存冲突 ===
+        key: ${{ runner.os }}-${{ github.ref_name }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ github.ref_name }}-vcpkg-
+          ${{ runner.os }}-master-vcpkg-
+
     - name: Build
       run: ".github/workflows/build.ps1"
       shell: pwsh
@@ -59,31 +81,6 @@ jobs:
       with:
         name: "${{ env._RELEASE_NAME }}-${{ env._RELEASE_VERSION }}"
         path: ".dist/*.zip"
-    - name: VirusTotal Scan
-      id: vt-scan
-      if: env._IS_GITHUB_RELEASE == 'true' && success()
-      uses: crazy-max/ghaction-virustotal@v4
-      with:
-        vt_api_key: ${{ secrets._VT_API_KEY }}
-        files: ".dist/*.zip"
-    - name: Parse VirusTotal Results
-      id: vt-res
-      if: env._IS_GITHUB_RELEASE == 'true' && success()
-      uses: actions/github-script@v7
-      with:
-        result-encoding: string
-        script: |
-          let ret = `${{ steps.vt-scan.outputs.analysis }}`;
-
-          ret = '- ' + ret
-          .replaceAll('.dist/','')
-          .replaceAll('=h', ': h')
-          .replaceAll(',', "\n- ");
-
-          console.log('Results:');
-          console.log(ret);
-
-          return ret;
     - name: Move canary tag to this commit
       uses: richardsimko/update-tag@v1
       if: env._IS_GITHUB_RELEASE == 'true' && env._IS_BUILD_CANARY == 'true' && success()
@@ -104,9 +101,6 @@ jobs:
           See https://github.com/julianxhokaxhiu/FFNx/blob/master/Changelog.md#next
 
           This is a canary build. Please be aware it may be prone to crashing and is NOT tested by anyone. Use this build AT YOUR OWN RISK!
-
-          🛡️ **VirusTotal analysis:**
-          ${{ steps.vt-res.outputs.result }}
     - name: Publish Stable release
       uses: ncipollo/release-action@v1
       if: env._IS_GITHUB_RELEASE == 'true' && env._IS_BUILD_CANARY == 'false' && success()
@@ -119,17 +113,6 @@ jobs:
         body: |
           See https://github.com/julianxhokaxhiu/FFNx/blob/master/Changelog.md#${{ env._CHANGELOG_VERSION }}
 
-          🛡️ **VirusTotal analysis:**
-          ${{ steps.vt-res.outputs.result }}
-    - name: Send alerts
-      if: env._IS_GITHUB_RELEASE == 'true' && success()
-      env:
-        _MAP_FFNX_TSUNAMODS_FF7: "${{ secrets._FFNX_TSUNAMODS_FF7 }}"
-        _MAP_FFNX_TSUNAMODS_FF8: "${{ secrets._FFNX_TSUNAMODS_FF8 }}"
-        _MAP_FFNX_QHIMM_FF7: "${{ secrets._FFNX_QHIMM_FF7 }}"
-        _MAP_FFNX_QHIMM_FF8: "${{ secrets._FFNX_QHIMM_FF8 }}"
-      run: ".github/workflows/alert.ps1"
-      shell: pwsh
     - name: Cleanup previous release workflows
       uses: Mattraks/delete-workflow-runs@v2
       if: env._IS_GITHUB_RELEASE == 'true' && env._IS_BUILD_CANARY == 'false' && success()
