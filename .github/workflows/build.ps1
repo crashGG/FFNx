@@ -68,9 +68,9 @@ Get-Content "$env:temp\vcvars.txt" | Foreach-Object {
 [Environment]::SetEnvironmentVariable('VCPKG_ROOT','')
 
 # Add Github Packages registry
-nuget sources add -Name github -Source "https://nuget.pkg.github.com/julianxhokaxhiu/index.json" -Username ${env:GITHUB_REPOSITORY_OWNER} -Password ${env:GITHUB_PACKAGES_PAT} -StorePasswordInClearText
-nuget setApiKey ${env:GITHUB_PACKAGES_PAT} -Source "https://nuget.pkg.github.com/julianxhokaxhiu/index.json"
-nuget sources list
+# nuget sources add -Name github -Source "https://nuget.pkg.github.com/julianxhokaxhiu/index.json" -Username ${env:GITHUB_REPOSITORY_OWNER} -Password ${env:GITHUB_PACKAGES_PAT} -StorePasswordInClearText
+# nuget setApiKey ${env:GITHUB_PACKAGES_PAT} -Source "https://nuget.pkg.github.com/julianxhokaxhiu/index.json"
+# nuget sources list
 
 # Vcpkg setup
 cmd.exe /c "call $vcpkgRoot\bootstrap-vcpkg.bat"
