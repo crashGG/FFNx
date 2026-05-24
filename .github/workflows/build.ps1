@@ -63,8 +63,8 @@ Get-Content "$env:temp\vcvars.txt" | Foreach-Object {
   }
 }
 
-# Unset VCPKG_ROOT if set
-[Environment]::SetEnvironmentVariable('VCPKG_ROOT','')
+# 强制锁死 VCPKG_ROOT，确保所有编译出的 Pkg 实体都能被系统抓取到 ===
+$env:VCPKG_ROOT = "$(Get-Location)\vcpkg"
 
 # === 安全改造：完全移除原库主遗留的私有 NuGet 越权登录鉴权代码 ===
 Write-Output "Skipping external NuGet registry. Relying on GHA Native Caching instead."
